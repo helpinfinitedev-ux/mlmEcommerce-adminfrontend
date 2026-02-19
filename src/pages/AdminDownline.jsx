@@ -1278,7 +1278,7 @@
 // // // // // // // // // // // // // // // // // // // // // // // //       setFullTree(res.tree);
 // // // // // // // // // // // // // // // // // // // // // // // //       console.log("📦 Full Tree from backend:", res.tree);
 // // // // // // // // // // // // // // // // // // // // // // // //       setFilteredNodes(getNodesByLayer(res.tree, selectedLayer));
-    
+
 // // // // // // // // // // // // // // // // // // // // // // // //     } else {
 // // // // // // // // // // // // // // // // // // // // // // // //         console.error("❌ Failed to fetch downline:", res.message);
 // // // // // // // // // // // // // // // // // // // // // // // //       }
@@ -1292,7 +1292,7 @@
 // // // // // // // // // // // // // // // // // // // // // // // //   useEffect(() => {
 // // // // // // // // // // // // // // // // // // // // // // // //     fetchDownlineData();
 // // // // // // // // // // // // // // // // // // // // // // // //     }, []);
-    
+
 
 
 // // // // // // // // // // // // // // // // // // // // // // // //   useEffect(() => {
@@ -4566,10 +4566,25 @@
 
 
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import adminAPI from "../api/adminApi";
 import { buildTernaryTree } from "../utils/treeBuilder";
+
+// Recursively filter nodes by depth
+const filterByLayer = (nodes, layer, currentDepth = 1) => {
+  if (!nodes || nodes.length === 0) return [];
+  if (currentDepth === layer) {
+    // shallow copy of nodes, hide children
+    return nodes.map(n => ({ ...n, children: [] }));
+  }
+  return nodes
+    .map(n => ({
+      ...n,
+      children: filterByLayer(n.children, layer, currentDepth + 1),
+    }))
+    .filter(Boolean);
+};
 
 export default function AdminDownline() {
   const [fullTree, setFullTree] = useState([]);
@@ -4577,11 +4592,7 @@ export default function AdminDownline() {
   const [selectedLayer, setSelectedLayer] = useState(1);
   const [expandedNodes, setExpandedNodes] = useState({});
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const response = await adminAPI.getOrders();
       const orders = response.data || [];
@@ -4591,22 +4602,12 @@ export default function AdminDownline() {
     } catch (error) {
       console.error("❌ Error fetching data:", error);
     }
-  };
+  }, []);
 
-  // Recursively filter nodes by depth
-  const filterByLayer = (nodes, layer, currentDepth = 1) => {
-    if (!nodes || nodes.length === 0) return [];
-    if (currentDepth === layer) {
-      // shallow copy of nodes, hide children
-      return nodes.map(n => ({ ...n, children: [] }));
-    }
-    return nodes
-      .map(n => ({
-        ...n,
-        children: filterByLayer(n.children, layer, currentDepth + 1),
-      }))
-      .filter(Boolean);
-  };
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
 
   const handleLayerChange = layer => {
     setSelectedLayer(layer);

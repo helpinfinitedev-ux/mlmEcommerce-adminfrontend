@@ -15,7 +15,7 @@ import {
     Search,
     User as UserIcon
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const AdminLayout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -74,8 +74,8 @@ const AdminLayout = () => {
                                 key={item.path}
                                 to={item.path}
                                 className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                                        : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
                                     }`}
                             >
                                 <Icon size={22} className={isActive ? 'text-white' : 'group-hover:text-white'} />
