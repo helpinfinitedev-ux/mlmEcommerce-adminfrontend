@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional - apni custom CSS bhi yaha likh sakte ho */
+body {
+  @apply bg-white text-gray-900;
+}
